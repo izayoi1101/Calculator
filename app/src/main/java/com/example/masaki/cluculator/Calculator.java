@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 public class Calculator {
 
     protected static final int EXPECTED_ERROR=-1;
-    int result;
+    double result;
 
-    int calc_all(ArrayList<String> calcprocess){
+    double calc_all(ArrayList<String> calcprocess){
 
         //最終的な計算値が出る=計算過程(calcprocess)の要素数が1になるまで
         while(calcprocess.size()!=1) {
@@ -23,8 +23,8 @@ public class Calculator {
 
             for (String value : calcprocess) {
                 //演算子
-                if(index != calcprocess.size()-1) {
-                    if (!Pattern.matches("^[0-9]*$", value)) {
+                if(index < calcprocess.size()-1) {
+                    if (!Pattern.matches("\\d+(\\.\\d+)?", value)) {
                         priority = getPriority(value);
                         if (priority > priority_max) {
                             priority_max = priority;
@@ -46,12 +46,12 @@ public class Calculator {
             for (int i = first_index - 1; i + 2 <= last_index - 1; i += 2) {
                 if (i == first_index-1) {
                     if ((result =
-                            calc(Integer.parseInt(calcprocess.get(i)), calcprocess.get(i + 1), Integer.parseInt(calcprocess.get(i + 2)))) == -1) {
+                            calc(Double.parseDouble(calcprocess.get(i)), calcprocess.get(i + 1), Double.parseDouble(calcprocess.get(i + 2)))) == -1) {
                         //想定外の演算子エラー
                     }
                 } else {
                     if ((result =
-                            calc(result, calcprocess.get(i + 1), Integer.parseInt(calcprocess.get(i + 2)))) == -1) {
+                            calc(result, calcprocess.get(i + 1), Double.parseDouble(calcprocess.get(i + 2)))) == -1) {
                         //想定外の演算子エラー
                     }
                 }
@@ -68,14 +68,13 @@ public class Calculator {
         }
 
         //最終的な計算結果を返却
-        return Integer.parseInt(String.valueOf(result));
+        return Double.parseDouble(String.valueOf(result));
     }
 
     int getPriority(String a){
         switch(a){
             case ".":
                 return 3;
-            case "%":
             case "÷":
             case "×":
                 return 2;
@@ -87,12 +86,10 @@ public class Calculator {
     }
 
 
-    int calc(int value1,String ope,int value2){
+    double calc(double value1,String ope,double value2){
         switch(ope){
             case ".":
                 return -1;
-            case "%":
-                return value1 % value2;
             case "÷":
                 return value1 / value2;
             case "×":

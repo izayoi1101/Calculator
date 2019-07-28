@@ -17,6 +17,7 @@ public class ButtonClickListener implements View.OnClickListener {
 
     TextView textview;
     MainActivity activity;
+    static int opeCount=0;
 
     //計算過程
     protected static ArrayList<String> calcprocess=new ArrayList<String>();
@@ -32,46 +33,53 @@ public class ButtonClickListener implements View.OnClickListener {
         String inputValue=String.valueOf(((Button)view).getText());
         int viewId=view.getId();
         if(viewId==R.id.equal) {//計算
-            try{
-                //整合性チェック
-                Valid();
+            //数字の羅列を一つの要素にまとめる前処理
+            calcprocess=convert_num(calcprocess);
 
-                //数字の羅列を一つの要素にまとめる前処理
-                calcprocess=convert_num(calcprocess);
+            double result;
+            Calculator calculator = new Calculator();
+            result=calculator.calc_all(calcprocess);
 
-                int result;
-                Calculator calculator = new Calculator();
-                result=calculator.calc_all(calcprocess);
+            //calc_allによって計算結果のみとなっていると思うが、念のため計算結果のみを改めてセット。
+            calcprocess.clear();
+            calcprocess.add(String.valueOf(result));
 
-                //calc_allによって計算結果のみとなっていると思うが、念のため計算結果のみを改めてセット。
-                calcprocess.clear();
-                calcprocess.add(String.valueOf(result));
+            opeCount=0;
 
-                //計算結果を表示
-                textview.setText(String.valueOf(result));
-            }catch(IllegalValueException e){
-                Toast.makeText(activity,"不正です。入力しなおしてください",Toast.LENGTH_SHORT);
-            }
+            //計算結果を表示
+            textview.setText(String.valueOf(result));
 
         }else if (viewId==R.id.clear) {//画面クリア
+            opeCount=0;
             textview.setText("");
             calcprocess.clear();
         }else {//数字や演算記号
+            //計算過程に追記する
             String a="";
-            calcprocess.add(inputValue);
-            for(String value:calcprocess){
-                a+=value;
+
+            try {
+                //整合性チェック
+                Valid(inputValue);
+                calcprocess.add(inputValue);
+                for(String value:calcprocess){
+                    a+=value;
+                }
+                textview.setText(a);
+            } catch(IllegalValueException e){
+                Toast.makeText(activity,"不正です。入力しなおしてください",Toast.LENGTH_SHORT);
             }
-            textview.setText(a);
         }
     }
 
     //整合性チェック(不要な入力をしていないか)
-    private void Valid() throws IllegalValueException{
-        for(String a:calcprocess){
-            if(a.equals("+/-")||a.equals("%")||a.equals(".")){
-                throw new IllegalValueException();
-            }
+    private void Valid(String a) throws IllegalValueException{
+        if(!Pattern.matches("\\d+(\\.\\d+)?", a)){
+            opeCount++;
+        }
+
+        //演算子が2つ以上続くとエラー
+        if(opeCount>1){
+            throw new IllegalValueException();
         }
     }
 
@@ -81,7 +89,7 @@ public class ButtonClickListener implements View.OnClickListener {
         String addString="";
         int i=0;
         for(String a : list){
-            if (Pattern.matches("^[0-9]*$", a)) {
+            if (Pattern.matches("\\d+(\\.\\d+)?", a) || a.equals(".")) {
                 //数字の羅列を作る
                 addString+=a;
             }else{

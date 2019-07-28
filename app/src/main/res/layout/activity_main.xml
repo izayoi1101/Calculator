@@ -28,18 +28,16 @@
                 android:text="C" />
 
             <Button
-                android:tag="button"
                 android:id="@+id/button43"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="+/-" />
+                android:tag="button" />
 
             <Button
-                android:tag="button"
                 android:id="@+id/percent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="%" />
+                android:tag="button" />
 
             <Button
                 android:tag="button"

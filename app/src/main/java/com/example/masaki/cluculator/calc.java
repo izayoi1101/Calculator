@@ -23,7 +23,7 @@ public class calc{
         ArrayList<String> list = new ArrayList<String>(Arrays.asList("4","+","5","×","6","×","7","÷","3","+","2"));
         System.out.println(calc.calc_all(list));
 
-        list = new ArrayList<String>(Arrays.asList("4","5","7","9","×","7","3","+","2","7","2"));
+        list = new ArrayList<String>(Arrays.asList("4",".","7","×","2"));
         ButtonClickListener a = new ButtonClickListener(null);
         list=a.convert_num(list);
         int i=0;

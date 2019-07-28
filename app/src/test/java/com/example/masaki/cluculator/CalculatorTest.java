@@ -11,7 +11,8 @@ import static org.junit.Assert.assertEquals;
 public class CalculatorTest {
 
     private Calculator calculator;
-    ArrayList<String> list = new ArrayList<String>(Arrays.asList("4","+","5","×","6","×","7","÷","3","+","2"));
+//    ArrayList<String> list = new ArrayList<String>(Arrays.asList("4","+","5","×","6","×","7","÷","3","+","2"));
+    ArrayList<String> list = new ArrayList<String>(Arrays.asList("4.5","+","5.4"));
 
     @Before
     public void setUp() throws Exception {
@@ -25,6 +26,6 @@ public class CalculatorTest {
     @Test
     public void テスト1() throws Exception {
         //予想：1 + 5 で 6が返ってくるはず
-        assertEquals(76, calculator.calc_all(list));
+        assertEquals(9.9, calculator.calc_all(list));
     }
 }
