@@ -17,7 +17,7 @@ public class ButtonClickListener implements View.OnClickListener {
 
     TextView textview;
     MainActivity activity;
-    static int opeCount=0;
+    static int opeCount=0,callCount=0;
 
     //計算過程
     protected static ArrayList<String> calcprocess=new ArrayList<String>();
@@ -30,26 +30,36 @@ public class ButtonClickListener implements View.OnClickListener {
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onClick(View view) {
+        callCount++;
         String inputValue=String.valueOf(((Button)view).getText());
         int viewId=view.getId();
         if(viewId==R.id.equal) {//計算
-            //数字の羅列を一つの要素にまとめる前処理
-            calcprocess=convert_num(calcprocess);
+            try {
+                //計算過程の末尾が演算子であればエラー
+                if(!Pattern.matches("^[0-9]*$", calcprocess.get(calcprocess.size()-1))){
+                    throw new IllegalValueException();
+                }
 
-            double result;
-            Calculator calculator = new Calculator();
-            result=calculator.calc_all(calcprocess);
+                //数字の羅列を一つの要素にまとめる前処理
+                calcprocess = convert_num(calcprocess);
 
-            //calc_allによって計算結果のみとなっていると思うが、念のため計算結果のみを改めてセット。
-            calcprocess.clear();
-            calcprocess.add(String.valueOf(result));
+                double result;
+                Calculator calculator = new Calculator();
+                result = calculator.calc_all(calcprocess);
 
-            opeCount=0;
+                //calc_allによって計算結果のみとなっていると思うが、念のため計算結果のみを改めてセット。
+                calcprocess.clear();
+                calcprocess.add(String.valueOf(result));
 
-            //計算結果を表示
-            textview.setText(String.valueOf(result));
+                opeCount = 0;
 
+                //計算結果を表示
+                textview.setText(String.valueOf(result));
+            }catch(IllegalValueException e){
+
+            }
         }else if (viewId==R.id.clear) {//画面クリア
+            callCount=0;
             opeCount=0;
             textview.setText("");
             calcprocess.clear();
@@ -75,10 +85,12 @@ public class ButtonClickListener implements View.OnClickListener {
     private void Valid(String a) throws IllegalValueException{
         if(!Pattern.matches("\\d+(\\.\\d+)?", a)){
             opeCount++;
+        }else{
+            opeCount=0;
         }
 
-        //演算子が2つ以上続くとエラー
-        if(opeCount>1){
+        //演算子が2つ以上続く　または　最初に演算子を入力するとエラー
+        if(opeCount>1 || (callCount==1 && !Pattern.matches("^[0-9]*$", a))){
             throw new IllegalValueException();
         }
     }
