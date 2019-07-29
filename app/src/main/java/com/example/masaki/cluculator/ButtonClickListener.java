@@ -17,7 +17,7 @@ public class ButtonClickListener implements View.OnClickListener {
 
     TextView textview;
     MainActivity activity;
-    private static int opeCount=0,numCount=0,callCount=0;
+    private static int opeCount=0,numCount=0,callCount=0,decCount=0;
 
     //計算過程
     protected static ArrayList<String> calcprocess=new ArrayList<String>();
@@ -56,6 +56,7 @@ public class ButtonClickListener implements View.OnClickListener {
 
                 opeCount = 0;
                 numCount=0;
+                decCount=0;
 
                 //計算結果を表示
                 textview.setText(String.valueOf(result));
@@ -66,6 +67,7 @@ public class ButtonClickListener implements View.OnClickListener {
             callCount=0;
             opeCount=0;
             numCount=0;
+            decCount=0;
             textview.setText("");
             calcprocess.clear();
         }else {//数字や演算記号
@@ -88,26 +90,31 @@ public class ButtonClickListener implements View.OnClickListener {
 
     //整合性チェック(不要な入力をしていないか)
     private void Valid(String a) throws IllegalValueException{
-        if(!Pattern.matches("\\d+(\\.\\d+)?", a)){
+        if(!Pattern.matches("\\d+(\\.\\d+)?", a) && !a.equals(".")){
             opeCount++;
-        }else{
+        }else if(!a.equals(".")){
             opeCount=0;
         }
 
-        //今入力している整数、小数の桁数を算出する
+        //今入力している整数、小数の桁数または、小数点の個数を算出する
         if(Pattern.matches("\\d+(\\.\\d+)?", a)){
             numCount++;
-        }else if(!a.equals(".")){//演算子(「.」を除く)ならリセットする
+        }else if(a.equals(".")){
+            decCount++;
+        }else{//演算子(「.」を除く)ならリセットする
             numCount=0;
+            decCount=0;
         }
 
         //演算子が2つ以上続く　または　最初に演算子を入力するとエラー
-        if(opeCount>1 || (callCount==1 && !Pattern.matches("^[0-9]*$", a))){
+        //整数、小数の羅列が最大桁数を超えるとエラー
+        //小数の小数点の個数が1より大きいとエラー
+        if(opeCount>1 || (callCount==1 && !Pattern.matches("^[0-9]*$", a)) || numCount>MAX_NUMBER_OF_DIGITS){
             throw new IllegalValueException();
         }
 
-        //整数、小数の羅列が最大桁数を超えるとエラー
-        if(numCount>MAX_NUMBER_OF_DIGITS){
+        if(decCount>1){
+            decCount=1;
             throw new IllegalValueException();
         }
     }
