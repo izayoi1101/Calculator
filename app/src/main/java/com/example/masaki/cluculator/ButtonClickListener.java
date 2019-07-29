@@ -17,10 +17,13 @@ public class ButtonClickListener implements View.OnClickListener {
 
     TextView textview;
     MainActivity activity;
-    static int opeCount=0,callCount=0;
+    private static int opeCount=0,numCount=0,callCount=0;
 
     //計算過程
     protected static ArrayList<String> calcprocess=new ArrayList<String>();
+
+    //最大桁数
+    private static final int MAX_NUMBER_OF_DIGITS=8;
 
     public ButtonClickListener(MainActivity activity){
         this.textview=activity.textview;
@@ -52,6 +55,7 @@ public class ButtonClickListener implements View.OnClickListener {
                 calcprocess.add(String.valueOf(result));
 
                 opeCount = 0;
+                numCount=0;
 
                 //計算結果を表示
                 textview.setText(String.valueOf(result));
@@ -61,6 +65,7 @@ public class ButtonClickListener implements View.OnClickListener {
         }else if (viewId==R.id.clear) {//画面クリア
             callCount=0;
             opeCount=0;
+            numCount=0;
             textview.setText("");
             calcprocess.clear();
         }else {//数字や演算記号
@@ -89,8 +94,20 @@ public class ButtonClickListener implements View.OnClickListener {
             opeCount=0;
         }
 
+        //今入力している整数、小数の桁数を算出する
+        if(Pattern.matches("\\d+(\\.\\d+)?", a)){
+            numCount++;
+        }else if(!a.equals(".")){//演算子(「.」を除く)ならリセットする
+            numCount=0;
+        }
+
         //演算子が2つ以上続く　または　最初に演算子を入力するとエラー
         if(opeCount>1 || (callCount==1 && !Pattern.matches("^[0-9]*$", a))){
+            throw new IllegalValueException();
+        }
+
+        //整数、小数の羅列が最大桁数を超えるとエラー
+        if(numCount>MAX_NUMBER_OF_DIGITS){
             throw new IllegalValueException();
         }
     }
